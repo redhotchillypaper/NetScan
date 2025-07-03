@@ -1,63 +1,57 @@
 import ipaddress
 import socket
-import ip_manipulations as ipm
+import ip_config as ipc
+import beauty
+import asyncio
 
 
 
 
-def grab_banner(ip, port, timeout=2):
-    try:
-        s = socket.socket()
-        s.settimeout(timeout)
-        s.connect((ip, port))
+async def main():
+    results = await beauty.b_asyncscan_localnetwork()  
+    results = [(ip, ports) for ip, ports in results if ports]
+    banners = await beauty.b_asyncgrab_banners(results)
+    useful_banners = [banner for banner in banners if ipc.is_banner_useful(banner)]
+    print("\n\n\n\n\n\n")
+    for each in useful_banners:
+        print(f"{'-'*30}")
+        print(each)
+    print(useful_banners[0])
 
-        s.send(b"GET / HTTP/1.0\r\n\r\n")
-        banner = s.recv(1024)
-        s.close()
-        return banner.decode(errors="ignore")
-    except Exception as e:
-        return f"Error: {e}"
 
-def main():
 
-    local_ip = ipm.get_local_ip()
-    network = ipm.get_local_network(local_ip)
-    port_to_check = 80
-    alive = ipm.scan_network(network, port_to_check)
-    print(f"Live connections with open port {port_to_check}: {alive}")
-    # response = grab_banner("192.168.68.1", 80) 
-    # print("\nResponse:\n" + response)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
 
 
 
 
 
+# from scapy.all import ARP, Ether, srp
+
+# def arp_scan(network_cidr):
+#     # Створюємо ARP-запит і обгортку Ethernet
+#     arp = ARP(pdst=network_cidr)
+#     ether = Ether(dst="ff:ff:ff:ff:ff:ff")
+#     packet = ether/arp
+
+#     # Відправляємо пакет у мережу і отримуємо відповіді
+#     result = srp(packet, timeout=3, verbose=0)[0]
+
+#     # Парсимо відповіді
+#     devices = []
+#     for sent, received in result:
+#         devices.append({'ip': received.psrc, 'mac': received.hwsrc})
+
+#     return devices
+
+# if __name__ == "__main__":
+#     network = "192.168.68.0/24"
+#     devices = arp_scan(network)
+#     print("Devices found:")
+#     for device in devices:
+#         print(f"IP: {device['ip']}  MAC: {device['mac']}")
 
 
-
-
-
-# import subprocess
-# import platform
-
-# def ping(host):
-#     param = '-n' if platform.system().lower()=='windows' else '-c'
-#     command = ['ping', param, '1', host]
-#     return subprocess.call(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0
-
-# network = "192.168.1.0/24"
-# import ipaddress
-
-# alive_hosts = []
-# for ip in ipaddress.ip_network(network).hosts():
-#     ip_str = str(ip)
-#     if ping(ip_str):
-#         print(f"[+] {ip_str} живий (ping ok)")
-#         alive_hosts.append(ip_str)
-#     else:
-#         print(f"[-] {ip_str} не відповідає")
-# print(f"Живі хости: {alive_hosts}")
