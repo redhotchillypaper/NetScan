@@ -14,6 +14,7 @@ Lightweight Python tool for scanning devices on a local network.
 python main.py 
 ```
 ## Example
+```md
 OPEN IPS/PORTS:
 x.x.2.1:53 -> open
 x.x.2.43:62078 -> open
@@ -34,3 +35,4 @@ googlewebostv
 IP:x.x.2.43
 MAC:x:x:x:x:x:x
 Available ports:[62078]
+```
