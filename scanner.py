@@ -3,7 +3,6 @@ import re
 import socket
 import requests
 import ipaddress
-import asyncio
 import subprocess
 import platform
 from scapy.all import ARP, Ether, srp
@@ -78,11 +77,6 @@ def check_port(ip, port, timeout=1):
         return False  # closed
     except Exception as e:
         return False
-    
-
-
-
-
 
 # ARP scan
 
@@ -118,3 +112,20 @@ def get_arp_devices():
             }
 
     return devices
+
+
+def generate_report():
+    devices = get_arp_devices()
+    report = []
+    report.append("OPEN IPS:PORTS:")
+    for ip in devices:
+        for port in PORTS:
+            if check_port(ip, port):
+                devices[ip]["ports"].append(port)
+                report.append(f"{ip}:{port} -> open")
+    report.append(f"\nDEVICES in the local network ({len(devices)}):")
+    for ip in devices:
+        report.append("---------------")
+        report.append(f"{devices[ip]['name']}\nIP:{ip}\nMAC:{devices[ip]['mac']}\nAvailable ports:{devices[ip]['ports']}")
+
+    return "\n".join(report)

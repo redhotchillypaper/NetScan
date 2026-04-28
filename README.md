@@ -11,8 +11,10 @@ Lightweight Python tool for scanning devices on a local network.
 ## Usage
 
 ```bash
-python main.py
-Example
+python main.py 
+```
+## Example
+OPEN IPS/PORTS:
 x.x.2.1:53 -> open
 x.x.2.43:62078 -> open
 
